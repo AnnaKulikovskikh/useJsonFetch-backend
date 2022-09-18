@@ -1,33 +1,31 @@
-const http = require('http');
-const Koa = require('koa');
-const Router = require('koa-router');
-const cors = require('koa2-cors');
-const koaBody = require('koa-body');
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const server = express();
+server.use(cors());
+server.use(bodyParser());
 
-const app = new Koa();
-app.use(cors());
-app.use(koaBody());
-
-const router = new Router();
-router.get('/data', async (ctx, next) => {
-    ctx.response.body = {status: "ok"};
+server.get("/data", async (req, res) => {
+  console.log("call");
+  res.send({ status: "ok" });
+  res.end();
 });
-router.get('/error', async (ctx, next) => {
-    ctx.response.status = 500;
-    ctx.response.body = {status: "Internal Error"};
+server.get("/error", async (req, res) => {
+  res.status = 500;
+  res.send({ status: "Internal Error" });
+  res.end();
 });
-router.get('/loading', async (ctx, next) => {
-    await new Promise(resolve => {
-        setTimeout(() => {
-            resolve();
-        }, 5000);
-    });
-    ctx.response.body = {status: "ok"};
+server.get("/loading", async (req, res) => {
+  await new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 5000);
+  });
+  res.send({ status: "ok" });
+  res.end();
 });
-
-app.use(router.routes())
-app.use(router.allowedMethods());
 
 const port = process.env.PORT || 7070;
-const server = http.createServer(app.callback());
-server.listen(port);
+server.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
